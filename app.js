@@ -3,14 +3,11 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const db = require('./mongoose');
 
-// Database
-const monk = require('monk');
-const db = monk('localhost:27017/google-maps-generator');
-
+const models = require('./models');
 const index = require('./routes/index');
 const locationsApi = require('./routes/api/locations');
-
 const app = express();
 
 // view engine setup
@@ -28,7 +25,6 @@ app.use(function(req,res,next){
     req.db = db;
     next();
 });
-
 
 app.use('/', index);
 app.use('/api/locations', locationsApi);

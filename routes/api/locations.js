@@ -1,15 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const ObjectID = require('mongodb').ObjectID;
+const mongoose = require('mongoose');
+const Location = mongoose.model('Location');
 
 /**
  * Get locations list
  */
 router.get('/', function(request, response) {
-    const db = request.db;
-    const collection = db.get('locations');
-    collection.find({},{},function(error, results){
-        response.json(results);
+    Location.find({}, function (error, docs) {
+        if (error) {
+            response.status(500).send({ message: 'There was a problem with getting the locations from the database:' + error });
+        } else {
+            response.json(docs);
+        }
     });
 });
 
@@ -17,27 +20,22 @@ router.get('/', function(request, response) {
  * Get location by id
  */
 router.get('/:locationId', function(request, response) {
-    const db = request.db;
-    const collection = db.get('locations');
     const locationId = request.params.locationId;
 
-    collection.findOne({"_id": new ObjectID(locationId)}, function(error, result) {
+    Location.findById(locationId, function(error, doc) {
         if (error) {
             response.status(500).send({ message: 'There was a problem with getting the information from the database:' + error });
         } else {
-            response.json(result);
+            response.json(doc);
         }
     });
 });
-
 
 /**
  * Add new location
  */
 router.post('/', function(request, response) {
-    const db = request.db;
-    const collection = db.get('locations');
-    const location = {
+    const location = new Location({
         name: request.body.name,
         type: request.body.type,
         latitude: request.body.latitude,
@@ -48,10 +46,10 @@ router.post('/', function(request, response) {
         city: request.body.city,
         phone: request.body.phone,
         email: request.body.email,
-        website: request.body.website,
-    };
+        website: request.body.website
+    });
 
-    collection.insert(location, function (error, result) {
+    location.save(function (error, result) {
         if (error) {
             response.status(500).send({ message: 'There was a problem with adding the object to the database: ' + error });
         } else {
@@ -68,10 +66,7 @@ router.post('/', function(request, response) {
  * Update location
  */
 router.put('/:locationId', function(request, response) {
-    const db = request.db;
-    const collection = db.get('locations');
-    const locationId = request.params.locationId;
-    const location = {
+    const updateData = {
         name: request.body.name,
         type: request.body.type,
         latitude: request.body.latitude,
@@ -82,16 +77,18 @@ router.put('/:locationId', function(request, response) {
         city: request.body.city,
         phone: request.body.phone,
         email: request.body.email,
-        website: request.body.website,
+        website: request.body.website
     };
 
-    collection.update({_id: locationId}, location, function (error, result) {
+    const query = {'_id':request.params.locationId};
+
+    Location.findOneAndUpdate(query, updateData, {upsert:true}, function(error, doc){
         if (error) {
             response.status(500).send({ message: 'There was a problem with adding the object to the database: ' + error });
         } else {
             response.json({
                 message: 'Location was successfully updated',
-                result: result
+                result: doc
             });
         }
     });
@@ -101,17 +98,12 @@ router.put('/:locationId', function(request, response) {
  * Delete location
  */
 router.delete('/:locationId', function(request, response) {
-    const db = request.db;
-    const collection = db.get('locations');
-    const locationId = request.params.locationId;
-
-    collection.remove({"_id": new ObjectID(locationId)}, function(error, result) {
+    Location.findByIdAndRemove(request.params.locationId, function(error) {
         if (error) {
             response.status(500).send({ message: 'There was a problem with removing the object from the database: ' + error });
         } else {
             response.send({
-                message: 'Object was successfully removed',
-                result: result
+                message: 'Location was successfully removed'
             });
         }
     });
