@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  div.container
+    div.row
+      div.col-xs-12.col-sm-6.col-sm-offset-3
+        form.login-form(action="/login", method="post")
+          h2 Login form
+          div.form-group
+            label(for="email-input") E-mail
+            input.form-control(id="email-input", type="email", name="email")
+          div.form-group
+            label(for="password-input") Password
+            input.form-control(id="password-input", type="password", name="password")
+          div.form-group
+            button.btn.btn-large.btn-primary Sign in
+
+          if error.length
+            p.alert.alert-danger= error

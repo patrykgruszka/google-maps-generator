@@ -1,12 +1,17 @@
-const express = require('express');
-const router = express.Router();
+'use strict';
+
+/**
+ * Module dependencies.
+ */
 const mongoose = require('mongoose');
 const Location = mongoose.model('Location');
 
 /**
  * Get locations list
+ * @param request
+ * @param response
  */
-router.get('/', function(request, response) {
+exports.list = function(request, response) {
     Location.find({}, function (error, docs) {
         if (error) {
             response.status(500).send({ message: 'There was a problem with getting the locations from the database:' + error });
@@ -14,12 +19,14 @@ router.get('/', function(request, response) {
             response.json(docs);
         }
     });
-});
+};
 
 /**
  * Get location by id
+ * @param request
+ * @param response
  */
-router.get('/:locationId', function(request, response) {
+exports.get = function(request, response) {
     const locationId = request.params.locationId;
 
     Location.findById(locationId, function(error, doc) {
@@ -29,12 +36,14 @@ router.get('/:locationId', function(request, response) {
             response.json(doc);
         }
     });
-});
+};
 
 /**
- * Add new location
+ * Create new location
+ * @param request
+ * @param response
  */
-router.post('/', function(request, response) {
+exports.create = function(request, response) {
     const location = new Location({
         name: request.body.name,
         type: request.body.type,
@@ -59,13 +68,14 @@ router.post('/', function(request, response) {
             });
         }
     });
-});
-
+};
 
 /**
  * Update location
+ * @param request
+ * @param response
  */
-router.put('/:locationId', function(request, response) {
+exports.update = function(request, response) {
     const updateData = {
         name: request.body.name,
         type: request.body.type,
@@ -92,12 +102,14 @@ router.put('/:locationId', function(request, response) {
             });
         }
     });
-});
+};
 
 /**
  * Delete location
+ * @param request
+ * @param response
  */
-router.delete('/:locationId', function(request, response) {
+exports.delete = function(request, response) {
     Location.findByIdAndRemove(request.params.locationId, function(error) {
         if (error) {
             response.status(500).send({ message: 'There was a problem with removing the object from the database: ' + error });
@@ -107,6 +119,4 @@ router.delete('/:locationId', function(request, response) {
             });
         }
     });
-});
-
-module.exports = router;
+};

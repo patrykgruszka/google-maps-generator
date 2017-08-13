@@ -1,3 +1,5 @@
+'use strict';
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -15,6 +17,4 @@ const LocationSchema = Schema({
     website: {type: String}
 });
 
-const Location = mongoose.model('Location', LocationSchema);
-
-exports.LocationModel = Location;
+mongoose.model('Location', LocationSchema);
