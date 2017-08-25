@@ -21,6 +21,7 @@ module.exports = function(app, passport) {
 
     // authentication
     app.get('/login', users.login);
+    app.get('/signup', users.signup);
     app.post('/login', pauth('local', {
         successRedirect: '/',
         failureRedirect: '/login',

@@ -37,10 +37,6 @@ UserSchema
 /**
  * Validations
  */
-UserSchema.path('name').validate(function (name) {
-    return name.length;
-}, 'Name cannot be blank');
-
 UserSchema.path('email').validate(function (email) {
     return email.length;
 }, 'Email cannot be blank');
@@ -56,10 +52,6 @@ UserSchema.path('email').validate(function (email, fn) {
     } else fn(true);
 }, 'Email already exists');
 
-UserSchema.path('username').validate(function (username) {
-    return username.length;
-}, 'Username cannot be blank');
-
 UserSchema.path('hashed_password').validate(function (hashed_password) {
     return hashed_password.length && this._password.length;
 }, 'Password cannot be blank');
@@ -73,7 +65,7 @@ const validatePresenceOf = value => value && value.length;
 UserSchema.pre('save', function (next) {
     if (!this.isNew) return next();
 
-    if (!validatePresenceOf(this.password) && !this.skipValidation()) {
+    if (!validatePresenceOf(this.password)) {
         next(new Error('Invalid password'));
     } else {
         next();

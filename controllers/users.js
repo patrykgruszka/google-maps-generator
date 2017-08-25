@@ -29,14 +29,15 @@ exports.list = function(request, response) {
 exports.create = function(request, response) {
     const user = new User(request.body);
 
-    user.save(function (error, result) {
+    user.save(function (error) {
         if (error) {
-            response.status(500).send({ message: error });
+            const errors = Object.keys(error.errors)
+                .map(field => error.errors[field].message);
+            request.flash('errors', errors);
+            response.redirect('/signup');
         } else {
-            response.json({
-                message: 'User was added successfully to database',
-                result: result
-            });
+            request.flash('success', 'User was added successfully to database');
+            response.redirect('/login');
         }
     });
 };
@@ -49,7 +50,21 @@ exports.create = function(request, response) {
 exports.login = function(request, response) {
     response.render('login', {
         title: 'Login - Google Maps Generator',
-        error: request.flash('error')
+        errors: request.flash('error'),
+        info: request.flash('info'),
+        success: request.flash('success')
+    });
+};
+
+/**
+ * Register
+ * @param request
+ * @param response
+ */
+exports.signup = function(request, response) {
+    response.render('signup', {
+        title: 'New user registration - Google Maps Generator',
+        errors: request.flash('errors')
     });
 };
 
